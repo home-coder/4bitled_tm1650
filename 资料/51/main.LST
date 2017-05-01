@@ -1,0 +1,52 @@
+C51 COMPILER V7.50   MAIN                                                                  09/01/2014 09:59:35 PAGE 1   
+
+
+C51 COMPILER V7.50, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <REGX51.H>
+   2          #include <tm1650.h>
+   3          
+   4          void _delay_ms(unsigned int i)
+   5          {
+   6   1              unsigned char j,k;
+   7   1              while(i--)
+   8   1                      {
+   9   2                              for(j=0;j<4;j++)
+  10   2                                      for(k=0;k<250;k++);
+  11   2                      }
+  12   1      }
+  13          
+  14          int main(void)
+  15          {
+  16   1              unsigned char i,j;
+  17   1              Write_DATA(0x48,0x01);
+  18   1              while(1)
+  19   1                      {
+  20   2                              for(i=0;i<16;i++)
+  21   2                                      {
+  22   3                                              for(j=0;j<4;j++)
+  23   3                                                      {
+  24   4                                                              Write_DATA(0x68+2*j,tab[(j+i)%16]|0x80);
+  25   4                                                      }
+  26   3                                              _delay_ms(500);
+  27   3                                      }
+  28   2                      }
+  29   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    202    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     16    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,388 @@
+
+main.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000001b4  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000010  00800060  000001b4  00000228  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .debug_aranges 00000020  00000000  00000000  00000238  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  3 .debug_pubnames 00000081  00000000  00000000  00000258  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  4 .debug_info   000004ca  00000000  00000000  000002d9  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_abbrev 000001c9  00000000  00000000  000007a3  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_line   00000350  00000000  00000000  0000096c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_frame  00000080  00000000  00000000  00000cbc  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_str    00000117  00000000  00000000  00000d3c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_loc    00000129  00000000  00000000  00000e53  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_ranges 00000090  00000000  00000000  00000f7c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+   8:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+   c:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  10:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  14:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  18:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  1c:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  20:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  24:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  28:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  2c:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  30:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  34:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  38:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  3c:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  40:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  44:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  48:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  4c:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  50:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d8 e0       	ldi	r29, 0x08	; 8
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+
+00000060 <__do_copy_data>:
+  60:	10 e0       	ldi	r17, 0x00	; 0
+  62:	a0 e6       	ldi	r26, 0x60	; 96
+  64:	b0 e0       	ldi	r27, 0x00	; 0
+  66:	e4 eb       	ldi	r30, 0xB4	; 180
+  68:	f1 e0       	ldi	r31, 0x01	; 1
+  6a:	02 c0       	rjmp	.+4      	; 0x70 <.do_copy_data_start>
+
+0000006c <.do_copy_data_loop>:
+  6c:	05 90       	lpm	r0, Z+
+  6e:	0d 92       	st	X+, r0
+
+00000070 <.do_copy_data_start>:
+  70:	a0 37       	cpi	r26, 0x70	; 112
+  72:	b1 07       	cpc	r27, r17
+  74:	d9 f7       	brne	.-10     	; 0x6c <.do_copy_data_loop>
+  76:	0e 94 9f 00 	call	0x13e	; 0x13e <main>
+  7a:	0c 94 d8 00 	jmp	0x1b0	; 0x1b0 <_exit>
+
+0000007e <__bad_interrupt>:
+  7e:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+00000082 <TM1650_start>:
+#define	SDA_READ			READ_BIT(PIND,SDA)	//读引脚电平
+
+unsigned char tab[]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71};
+void TM1650_start(void)
+{
+	SDA_OUT;	//set SDA output
+  82:	8f 9a       	sbi	0x11, 7	; 17
+	SCL_high;
+  84:	96 9a       	sbi	0x12, 6	; 18
+	SDA_high;
+  86:	97 9a       	sbi	0x12, 7	; 18
+    can be achieved.
+*/
+void
+_delay_loop_1(uint8_t __count)
+{
+	__asm__ volatile (
+  88:	84 e0       	ldi	r24, 0x04	; 4
+  8a:	98 2f       	mov	r25, r24
+  8c:	9a 95       	dec	r25
+  8e:	f1 f7       	brne	.-4      	; 0x8c <TM1650_start+0xa>
+	_delay_us(1);
+	SDA_low;
+  90:	97 98       	cbi	0x12, 7	; 18
+  92:	8a 95       	dec	r24
+  94:	f1 f7       	brne	.-4      	; 0x92 <TM1650_start+0x10>
+	_delay_us(1);
+}
+  96:	08 95       	ret
+
+00000098 <TM1650_stop>:
+void TM1650_stop(void)
+{
+	SDA_OUT;
+  98:	8f 9a       	sbi	0x11, 7	; 17
+	SCL_high;
+  9a:	96 9a       	sbi	0x12, 6	; 18
+	SDA_low;
+  9c:	97 98       	cbi	0x12, 7	; 18
+  9e:	84 e0       	ldi	r24, 0x04	; 4
+  a0:	98 2f       	mov	r25, r24
+  a2:	9a 95       	dec	r25
+  a4:	f1 f7       	brne	.-4      	; 0xa2 <TM1650_stop+0xa>
+	_delay_us(1);
+	SDA_high;
+  a6:	97 9a       	sbi	0x12, 7	; 18
+  a8:	8a 95       	dec	r24
+  aa:	f1 f7       	brne	.-4      	; 0xa8 <TM1650_stop+0x10>
+	_delay_us(1);
+}
+  ac:	08 95       	ret
+
+000000ae <TM1650_ACK>:
+void TM1650_ACK(void)
+{
+	SCL_high;
+  ae:	96 9a       	sbi	0x12, 6	; 18
+	SDA_IN;			//set SDA input
+  b0:	8f 98       	cbi	0x11, 7	; 17
+  b2:	84 e0       	ldi	r24, 0x04	; 4
+  b4:	98 2f       	mov	r25, r24
+  b6:	9a 95       	dec	r25
+  b8:	f1 f7       	brne	.-4      	; 0xb6 <TM1650_ACK+0x8>
+	_delay_us(1);
+	SCL_low;
+  ba:	96 98       	cbi	0x12, 6	; 18
+  bc:	98 2f       	mov	r25, r24
+  be:	9a 95       	dec	r25
+  c0:	f1 f7       	brne	.-4      	; 0xbe <TM1650_ACK+0x10>
+	_delay_us(1);
+	SDA_OUT;
+  c2:	8f 9a       	sbi	0x11, 7	; 17
+  c4:	8a 95       	dec	r24
+  c6:	f1 f7       	brne	.-4      	; 0xc4 <TM1650_ACK+0x16>
+	_delay_us(1);
+}
+  c8:	08 95       	ret
+
+000000ca <TM1650_Write>:
+void TM1650_Write(unsigned char	DATA)			//写数据函数
+{
+	unsigned char i;
+	SDA_OUT;
+  ca:	8f 9a       	sbi	0x11, 7	; 17
+  cc:	94 e0       	ldi	r25, 0x04	; 4
+  ce:	9a 95       	dec	r25
+  d0:	f1 f7       	brne	.-4      	; 0xce <TM1650_Write+0x4>
+	_delay_us(1);
+	SCL_low;
+  d2:	96 98       	cbi	0x12, 6	; 18
+  d4:	20 e0       	ldi	r18, 0x00	; 0
+  d6:	34 e0       	ldi	r19, 0x04	; 4
+	for(i=0;i<8;i++)
+	{
+		if(DATA&0X80)
+  d8:	87 ff       	sbrs	r24, 7
+  da:	02 c0       	rjmp	.+4      	; 0xe0 <TM1650_Write+0x16>
+			SDA_high;
+  dc:	97 9a       	sbi	0x12, 7	; 18
+  de:	01 c0       	rjmp	.+2      	; 0xe2 <TM1650_Write+0x18>
+		else
+			SDA_low;
+  e0:	97 98       	cbi	0x12, 7	; 18
+		DATA<<=1;
+		SCL_low;
+  e2:	96 98       	cbi	0x12, 6	; 18
+  e4:	93 2f       	mov	r25, r19
+  e6:	9a 95       	dec	r25
+  e8:	f1 f7       	brne	.-4      	; 0xe6 <TM1650_Write+0x1c>
+		_delay_us(1);
+		SCL_high;
+  ea:	96 9a       	sbi	0x12, 6	; 18
+  ec:	93 2f       	mov	r25, r19
+  ee:	9a 95       	dec	r25
+  f0:	f1 f7       	brne	.-4      	; 0xee <TM1650_Write+0x24>
+		_delay_us(1);
+		SCL_low;
+  f2:	96 98       	cbi	0x12, 6	; 18
+  f4:	93 2f       	mov	r25, r19
+  f6:	9a 95       	dec	r25
+  f8:	f1 f7       	brne	.-4      	; 0xf6 <TM1650_Write+0x2c>
+{
+	unsigned char i;
+	SDA_OUT;
+	_delay_us(1);
+	SCL_low;
+	for(i=0;i<8;i++)
+  fa:	2f 5f       	subi	r18, 0xFF	; 255
+  fc:	28 30       	cpi	r18, 0x08	; 8
+  fe:	11 f0       	breq	.+4      	; 0x104 <TM1650_Write+0x3a>
+	{
+		if(DATA&0X80)
+			SDA_high;
+		else
+			SDA_low;
+		DATA<<=1;
+ 100:	88 0f       	add	r24, r24
+ 102:	ea cf       	rjmp	.-44     	; 0xd8 <TM1650_Write+0xe>
+ 104:	08 95       	ret
+
+00000106 <Write_DATA>:
+		SCL_low;
+		_delay_us(1);
+	}	
+}
+void Write_DATA(unsigned char add,unsigned char DATA)		//指定地址写入数据
+{
+ 106:	0f 93       	push	r16
+ 108:	1f 93       	push	r17
+ 10a:	18 2f       	mov	r17, r24
+ 10c:	06 2f       	mov	r16, r22
+	TM1650_start();
+ 10e:	0e 94 41 00 	call	0x82	; 0x82 <TM1650_start>
+	TM1650_Write(add);
+ 112:	81 2f       	mov	r24, r17
+ 114:	0e 94 65 00 	call	0xca	; 0xca <TM1650_Write>
+	TM1650_ACK();
+ 118:	0e 94 57 00 	call	0xae	; 0xae <TM1650_ACK>
+	TM1650_Write(DATA);
+ 11c:	80 2f       	mov	r24, r16
+ 11e:	0e 94 65 00 	call	0xca	; 0xca <TM1650_Write>
+	TM1650_ACK();
+ 122:	0e 94 57 00 	call	0xae	; 0xae <TM1650_ACK>
+	TM1650_stop();
+ 126:	0e 94 4c 00 	call	0x98	; 0x98 <TM1650_stop>
+}/*
+ 12a:	1f 91       	pop	r17
+ 12c:	0f 91       	pop	r16
+ 12e:	08 95       	ret
+
+00000130 <port_init>:
+#include	<util/delay.h>
+#include	<tm1650.h>
+
+void port_init(void)
+{
+	DDRD|=(1<<SDA)|(1<<SCL);
+ 130:	81 b3       	in	r24, 0x11	; 17
+ 132:	80 6c       	ori	r24, 0xC0	; 192
+ 134:	81 bb       	out	0x11, r24	; 17
+	PORTD|=(1<<SDA)|(1<<SCL);
+ 136:	82 b3       	in	r24, 0x12	; 18
+ 138:	80 6c       	ori	r24, 0xC0	; 192
+ 13a:	82 bb       	out	0x12, r24	; 18
+}
+ 13c:	08 95       	ret
+
+0000013e <main>:
+int main(void)
+{
+ 13e:	cf 92       	push	r12
+ 140:	df 92       	push	r13
+ 142:	ef 92       	push	r14
+ 144:	ff 92       	push	r15
+ 146:	0f 93       	push	r16
+ 148:	1f 93       	push	r17
+ 14a:	cf 93       	push	r28
+ 14c:	df 93       	push	r29
+#include	<util/delay.h>
+#include	<tm1650.h>
+
+void port_init(void)
+{
+	DDRD|=(1<<SDA)|(1<<SCL);
+ 14e:	81 b3       	in	r24, 0x11	; 17
+ 150:	80 6c       	ori	r24, 0xC0	; 192
+ 152:	81 bb       	out	0x11, r24	; 17
+	PORTD|=(1<<SDA)|(1<<SCL);
+ 154:	82 b3       	in	r24, 0x12	; 18
+ 156:	80 6c       	ori	r24, 0xC0	; 192
+ 158:	82 bb       	out	0x12, r24	; 18
+}
+int main(void)
+{
+	unsigned char i,j;
+	port_init();
+	Write_DATA(0x48,0x31);
+ 15a:	88 e4       	ldi	r24, 0x48	; 72
+ 15c:	61 e3       	ldi	r22, 0x31	; 49
+ 15e:	0e 94 83 00 	call	0x106	; 0x106 <Write_DATA>
+ 162:	00 e0       	ldi	r16, 0x00	; 0
+    milliseconds can be achieved.
+ */
+void
+_delay_loop_2(uint16_t __count)
+{
+	__asm__ volatile (
+ 164:	8c e2       	ldi	r24, 0x2C	; 44
+ 166:	c8 2e       	mov	r12, r24
+ 168:	81 e0       	ldi	r24, 0x01	; 1
+ 16a:	d8 2e       	mov	r13, r24
+ 16c:	1b c0       	rjmp	.+54     	; 0x1a4 <main+0x66>
+		{
+			for(i=0;i<16;i++)
+				{
+					for(j=0;j<4;j++)
+						{
+							Write_DATA(0x68+2*j,tab[(j+i)%16]|0x80);
+ 16e:	fe 01       	movw	r30, r28
+ 170:	ee 0d       	add	r30, r14
+ 172:	ff 1d       	adc	r31, r15
+ 174:	ef 70       	andi	r30, 0x0F	; 15
+ 176:	f0 70       	andi	r31, 0x00	; 0
+ 178:	e0 5a       	subi	r30, 0xA0	; 160
+ 17a:	ff 4f       	sbci	r31, 0xFF	; 255
+ 17c:	60 81       	ld	r22, Z
+ 17e:	60 68       	ori	r22, 0x80	; 128
+ 180:	81 2f       	mov	r24, r17
+ 182:	0e 94 83 00 	call	0x106	; 0x106 <Write_DATA>
+ 186:	21 96       	adiw	r28, 0x01	; 1
+ 188:	1e 5f       	subi	r17, 0xFE	; 254
+	Write_DATA(0x48,0x31);
+	while(1)
+		{
+			for(i=0;i<16;i++)
+				{
+					for(j=0;j<4;j++)
+ 18a:	10 37       	cpi	r17, 0x70	; 112
+ 18c:	81 f7       	brne	.-32     	; 0x16e <main+0x30>
+ 18e:	88 e8       	ldi	r24, 0x88	; 136
+ 190:	93 e1       	ldi	r25, 0x13	; 19
+ 192:	f6 01       	movw	r30, r12
+ 194:	31 97       	sbiw	r30, 0x01	; 1
+ 196:	f1 f7       	brne	.-4      	; 0x194 <main+0x56>
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 198:	01 97       	sbiw	r24, 0x01	; 1
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 19a:	d9 f7       	brne	.-10     	; 0x192 <main+0x54>
+	unsigned char i,j;
+	port_init();
+	Write_DATA(0x48,0x31);
+	while(1)
+		{
+			for(i=0;i<16;i++)
+ 19c:	0f 5f       	subi	r16, 0xFF	; 255
+ 19e:	00 31       	cpi	r16, 0x10	; 16
+ 1a0:	08 f0       	brcs	.+2      	; 0x1a4 <main+0x66>
+ 1a2:	00 e0       	ldi	r16, 0x00	; 0
+ 1a4:	c0 e0       	ldi	r28, 0x00	; 0
+ 1a6:	d0 e0       	ldi	r29, 0x00	; 0
+ 1a8:	18 e6       	ldi	r17, 0x68	; 104
+				{
+					for(j=0;j<4;j++)
+						{
+							Write_DATA(0x68+2*j,tab[(j+i)%16]|0x80);
+ 1aa:	e0 2e       	mov	r14, r16
+ 1ac:	ff 24       	eor	r15, r15
+ 1ae:	df cf       	rjmp	.-66     	; 0x16e <main+0x30>
+
+000001b0 <_exit>:
+ 1b0:	f8 94       	cli
+
+000001b2 <__stop_program>:
+ 1b2:	ff cf       	rjmp	.-2      	; 0x1b2 <__stop_program>
