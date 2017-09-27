@@ -15,13 +15,20 @@ struct tm1650_data {
 };
 struct i2c_client* gclient;
 
+/*
+* 使得显示器亮起来
+*/
 static inline tm1650_init_display(struct i2c_client *client)
 {
 	struct tm1650_data *data = i2c_get_clientdata(client);
+	client->addr = 0x24;
 	data->data[0] = 0x31;
 	i2c_master_send(client, data->data, 1);
 }
 
+/*
+* 显示器显示一个7的操作，图 [_ _ _ 7]
+*/
 void tm1650_set_time()
 {
 	struct tm1650_data *data = i2c_get_clientdata(gclient);
