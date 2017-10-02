@@ -768,7 +768,11 @@ static int tm1650_add_0000_8888(void *p)
 
 	return 0;
 }
-
+/*
++*spin_lock_irqsave等等自旋锁用处：1在中断中， 2在下半部
++*但是请记住所有的锁都是为了竟态同步而设计的, 中断中也需要保护共享数据
++*FIXME:下面的处理需要将共享数据加以保护
+*/
 static irqreturn_t tm1650_set_1111(int irq, void *data)
 {
 	struct tm1650_data *tmdata = (struct tm1650_data *)data;
