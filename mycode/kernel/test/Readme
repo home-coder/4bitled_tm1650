@@ -1,0 +1,16 @@
+根据opt来区别不同的测试项
+
+1.进程pid显示到led上面，按键NEXTPID切换到下一个pid,DELPID杀死当前进程
+2.可以根据参数的进程名字来显示该进程的pid
+
+1.根据参数来读入time文件，并排序显示道led,并以当前时间后面最近的时刻显示到led
+2.NEXTTIME显示下一个定时时间，DELTIME删除当前定时时间
+3.inotify检测time文件，如果发生变化，那么led闪烁3次，然后显示下一个节点数据
+
+
+搞清楚：
+extern static
+_setup
+mmap
+poll
+list
