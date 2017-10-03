@@ -2,14 +2,14 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <linux/netlink.h>
-#include <stdlib.h>  
-#include <errno.h>  
-#include <unistd.h>  
-#include <fcntl.h>  
-#include <sys/wait.h>  
-#include <sys/types.h>  
-#include <sys/socket.h>  
-#include <sys/un.h>  
+#include <stdlib.h>
+#include <errno.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <linux/socket.h>
 #include <poll.h>
 
@@ -25,15 +25,15 @@ struct uevent {
 };
 
 struct ucred {
-	__u32   pid;
-	__u32   uid;
-	__u32   gid;
+	__u32 pid;
+	__u32 uid;
+	__u32 gid;
 };
 
 static int open_uevent_socket(void)
 {
 	struct sockaddr_nl addr;
-	int sz = 64*1024;
+	int sz = 64 * 1024;
 	int on = 1;
 	int s;
 
@@ -43,13 +43,13 @@ static int open_uevent_socket(void)
 	addr.nl_groups = 0xffffffff;
 
 	s = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
-	if(s < 0)
+	if (s < 0)
 		return -1;
 
 	setsockopt(s, SOL_SOCKET, SO_RCVBUFFORCE, &sz, sizeof(sz));
 	setsockopt(s, SOL_SOCKET, SO_PASSCRED, &on, sizeof(on));
 
-	if(bind(s, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+	if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
 		close(s);
 		return -1;
 	}
@@ -67,39 +67,38 @@ static void parse_event(const char *msg, struct uevent *uevent)
 	uevent->major = -1;
 	uevent->minor = -1;
 
-	while(*msg) {
+	while (*msg) {
 		printf("%s\n", msg);
-		if(!strncmp(msg, "ACTION=", 7)) {
+		if (!strncmp(msg, "ACTION=", 7)) {
 			msg += 7;
 			uevent->action = msg;
-		} else if(!strncmp(msg, "DEVPATH=", 8)) {
+		} else if (!strncmp(msg, "DEVPATH=", 8)) {
 			msg += 8;
 			uevent->path = msg;
-		} else if(!strncmp(msg, "SUBSYSTEM=", 10)) {
+		} else if (!strncmp(msg, "SUBSYSTEM=", 10)) {
 			msg += 10;
 			uevent->subsystem = msg;
-		} else if(!strncmp(msg, "FIRMWARE=", 9)) {
+		} else if (!strncmp(msg, "FIRMWARE=", 9)) {
 			msg += 9;
 			uevent->firmware = msg;
-		} else if(!strncmp(msg, "MAJOR=", 6)) {
+		} else if (!strncmp(msg, "MAJOR=", 6)) {
 			msg += 6;
 			uevent->major = atoi(msg);
-		} else if(!strncmp(msg, "MINOR=", 6)) {
+		} else if (!strncmp(msg, "MINOR=", 6)) {
 			msg += 6;
 			uevent->minor = atoi(msg);
-		} else if(!strncmp(msg, "ALARM=", 6)) { //ALARM事件过滤此字段
+		} else if (!strncmp(msg, "ALARM=", 6)) {	//ALARM事件过滤此字段
 			msg += 6;
 			uevent->keyevent = msg;
 			printf("msg=%s\n", msg);
 		}
 
-		while(*msg++)
-			;
+		while (*msg++) ;
 	}
 
 	printf("event { '%s', '%s', '%s', '%s', %d, %d }\n",
-			uevent->action, uevent->path, uevent->subsystem,
-			uevent->firmware, uevent->major, uevent->minor);
+	       uevent->action, uevent->path, uevent->subsystem,
+	       uevent->firmware, uevent->major, uevent->minor);
 #endif
 }
 
@@ -107,11 +106,12 @@ static void parse_event(const char *msg, struct uevent *uevent)
 void handle_device_fd(int fd)
 {
 	printf("enter %s\n", __func__);
-	char msg[UEVENT_MSG_LEN+2];
+	char msg[UEVENT_MSG_LEN + 2];
 	char cred_msg[CMSG_SPACE(sizeof(struct ucred))];
-	struct iovec iov = {msg, sizeof(msg)};
+	struct iovec iov = { msg, sizeof(msg) };
 	struct sockaddr_nl snl;
-	struct msghdr hdr = {&snl, sizeof(snl), &iov, 1, cred_msg, sizeof(cred_msg), 0};
+	struct msghdr hdr =
+	    { &snl, sizeof(snl), &iov, 1, cred_msg, sizeof(cred_msg), 0 };
 	while (1) {
 		struct pollfd fds;
 		int nr;
@@ -119,9 +119,9 @@ void handle_device_fd(int fd)
 		fds.fd = fd;
 		fds.events = POLLIN;
 		fds.revents = 0;
-		nr = poll(&fds, 1, -1); //非阻塞
+		nr = poll(&fds, 1, -1);	//非阻塞
 
-		if(nr > 0 && (fds.revents & POLLIN)) {
+		if (nr > 0 && (fds.revents & POLLIN)) {
 			ssize_t n = recvmsg(fd, &hdr, 0);
 			if (n <= 0) {
 				break;
@@ -131,21 +131,21 @@ void handle_device_fd(int fd)
 				continue;
 			}
 
-			struct cmsghdr * cmsg = CMSG_FIRSTHDR(&hdr);
+			struct cmsghdr *cmsg = CMSG_FIRSTHDR(&hdr);
 			if (cmsg == NULL || cmsg->cmsg_type != SCM_CREDENTIALS) {
 				continue;
 			}
 
-			struct ucred * cred = (struct ucred *)CMSG_DATA(cmsg);
+			struct ucred *cred = (struct ucred *)CMSG_DATA(cmsg);
 			if (cred->uid != 0) {
 				continue;
 			}
 
-			if(n >= UEVENT_MSG_LEN)
+			if (n >= UEVENT_MSG_LEN)
 				continue;
 
 			msg[n] = '\0';
-			msg[n+1] = '\0';
+			msg[n + 1] = '\0';
 
 			struct uevent uevent;
 			parse_event(msg, &uevent);
