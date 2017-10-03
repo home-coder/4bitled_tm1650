@@ -11,6 +11,10 @@ struct list_head {
 		const typeof( ((type *)0)->member ) *__mptr = (ptr); \
 				(type *)( (char *)__mptr - offsetof(type,member) );})
 
+#define LIST_HEAD_INIT(name) { &(name), &(name) }
+#define LIST_HEAD(name) \
+struct list_head name = LIST_HEAD_INIT(name)
+
 static inline void INIT_LIST_HEAD(struct list_head *list)
 {
 	list->prev = list;
@@ -65,9 +69,9 @@ list_entry, list_for_each, list_for_each_entry
 #define list_for_each(ptr, list) \
 	for (ptr = (list)->next; ptr != (list); ptr = ptr->next)
 
-#define list_for_each_entry(ptr, head, member) \
-	for (ptr = list_entry(head->next, typeof(*ptr), member); \
-		&ptr->member != head; ptr = list_entry(ptr->member.next, \
-			typeof(*ptr), member))
+#define list_for_each_entry(pos, head, member)              \
+	for (pos = list_entry((head)->next, typeof(*pos), member);  \
+			&pos->member != (head);    \
+			pos = list_entry(pos->member.next, typeof(*pos), member))
 
 #endif /*_LIST_H*/
