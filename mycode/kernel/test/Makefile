@@ -11,9 +11,11 @@ else
 endif
 
 INCLUDE = -I ./include 
+all:tm1650 file_ops
 
 tm1650:tm1650.c
 		${CC} tm1650.c  -o $@ ${INCLUDE}  $(CFLAGS)
 	   rm -rf *.o
+file_ops:file_ops.c
 clean:
-	rm -rf *.o tm1650 
+	rm -rf *.o tm1650 file_ops 

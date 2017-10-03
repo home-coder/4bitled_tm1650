@@ -32,7 +32,7 @@
 #define TM1650_SET_1111 IMX_GPIO_NR(5, 19)
 #define TIMER_LIST		32
 
-enum {TM1650_DIS_LEV = 0, TM1650_SET_TIME};
+enum {TM1650_DIS_LEV = 0, TM1650_SET_DATA};
 enum {GET_YEAR = 0, GET_DAY, GET_SECOND, GET_BACK};
 static int flag;
 
@@ -346,7 +346,7 @@ static long tm1650_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		case TM1650_DIS_LEV:
 			client->addr = 0x24;
 			break;
-		case TM1650_SET_TIME:
+		case TM1650_SET_DATA:
 			client->addr = 0x34;
 			break;
 		default:
