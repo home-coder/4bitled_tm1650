@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <poll.h>
 #include <linux/input.h>
+#include <pthread.h>
 
 #define BUF_SIZE  256
 #define DEBUG_PRINT
@@ -67,7 +68,7 @@ static void add_proc(const char *identity)
 	}
 	get_proc_name((const char *)proc_status, tmproc->name);
 
-	dbgprint("%d %s\n", tmproc->pid, tmproc->name);
+	//dbgprint("%d %s\n", tmproc->pid, tmproc->name);
 	list_add_tail(&tmproc->lproc, &tm1650_proc_list);
 }
 
@@ -104,7 +105,7 @@ static void print_tm1650_list()
 {
 	tm1650_proc *ptmproc = NULL;
 	list_for_each_entry(ptmproc, &tm1650_proc_list, lproc) {
-		dbgprint("%d:%s\n", ptmproc->pid, ptmproc->name);
+		//dbgprint("%d:%s\n", ptmproc->pid, ptmproc->name);
 	}
 }
 
@@ -118,7 +119,7 @@ static void show_first_proc(int fd)
 
 	ptr = tm1650_proc_list.next;
 	tmproc = list_entry(ptr, tm1650_proc, lproc);
-	dbgprint("%d\n", tmproc->pid);
+	//dbgprint("%d\n", tmproc->pid);
 	if (ioctl(fd, TM1650_SET_DATA, &tmproc->pid)) {
 		dbgprint("set failed\n");
 		return ;
@@ -156,24 +157,31 @@ static int show_next_by_key(void)
 		key_fds[i].fd = key_fd[i];
 		key_fds[i].events = POLLIN;
 	}
-
+	
+	dbgprint("key event listen...\n");
 	while (1) {
 		l_ret = poll(key_fds, 2, -1);
+		if (l_ret < 0) {
+			dbgprint("poll error\n");
+			exit(-1);
+		}
 
 		for (i = 0; i < 2; i++) {
-			l_ret = lseek(key_fd[i], 0, SEEK_SET);
-			l_ret = read(key_fd[i], &key_event, sizeof(key_event));
+			if (key_fds[i].revents & POLLERR) {
+				dbgprint("device error\n");
+				exit(-1);
+			}
 
-			if (l_ret) {
-				if (key_event.type == EV_KEY
-				    && (key_event.value == 0
-					|| key_event.value == 1)) {
-
-					printf("key value(%d) %s",
-					       key_event.code,
-					       key_event.
-					       value ? "press" : "release");
-
+			if (key_fds[i].revents & POLLIN) {
+				lseek(key_fd[i], 0, SEEK_SET);
+				l_ret = read(key_fd[i], &key_event, sizeof(key_event));
+				//printf("l_ret = %d\n", l_ret);
+				if (l_ret) {
+					if (key_event.type == EV_KEY
+							&& (key_event.value == 0
+								|| key_event.value == 1)) {
+						printf("key value(%d) %s\n", key_event.code, key_event.value ? "press" : "release");
+					}
 				}
 			}
 		}
@@ -183,6 +191,17 @@ static int show_next_by_key(void)
 	close(key_fd[1]);
 
 	return l_ret;
+}
+
+static void show_by_listen_key()
+{
+	pthread_t pidl;
+	int ret;
+	ret = pthread_create(&pidl, NULL, (void *)show_next_by_key, NULL);
+	if (ret != 0) {
+		dbgprint("creat pthread error\n");
+	}
+	pthread_join(pidl, NULL);
 }
 
 /*
@@ -198,7 +217,7 @@ static void display_proc_list()
 	show_first_proc(tmfd);
 
 	/*创建一个线程来处理按键事件*/
-	show_next_by_key();
+	show_by_listen_key();
 }
 
 int main()
