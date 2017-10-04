@@ -108,6 +108,9 @@ static void print_tm1650_list()
 	}
 }
 
+/*
+具体数据的解析和发送，将会在kernel中处理
+*/
 static void show_first_proc(int fd)
 {
 	struct list_head *ptr;
@@ -122,6 +125,9 @@ static void show_first_proc(int fd)
 	}
 }
 
+/*
+网络链接出处：http://blog.csdn.net/liuyi_lab/article/details/53956623
+*/
 #define  KEY_EVENT_DEV0_NAME    "/dev/input/event0"
 #define  KEY_EVENT_DEV1_NAME    "/dev/input/event1"
 

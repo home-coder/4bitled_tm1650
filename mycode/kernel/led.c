@@ -85,7 +85,7 @@ static inline void tm1650_init_display(struct i2c_client *client)
 	i2c_master_send(client, data->data, 1);
 }
 
-static inline void set_time_core(unsigned char *tm1650_addr, unsigned \
+static inline void set_data_core(unsigned char *tm1650_addr, unsigned \
 	char *single_data)
 {
 	int i = 0, j = 0;
@@ -121,7 +121,7 @@ static void tm1650_set_time_work(struct work_struct *ws)
 	single_data[1] = tm.tm_sec / 10;
 	single_data[0] = tm.tm_sec % 10;
 	
-	set_time_core(tm1650_addr, single_data);
+	set_data_core(tm1650_addr, single_data);
 	flag = GET_BACK;
 }
 
@@ -327,6 +327,16 @@ count, loff_t *offset)
 	return ret;
 }
 
+static void set_single_data(unsigned char tmdata, unsigned char *single_data)
+{
+	int i, cent = 1000;
+	for (i = 0; i < 4; i++) {
+		single_data[3 - i] = tmdata / cent;
+		tmdata %= cent;
+		cent /= 10;
+	}
+}
+
 /*TODO cmd1:show level
   cmd2:show what
 */
@@ -335,7 +345,8 @@ static long tm1650_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	unsigned char tmdata;
 	struct tm1650_data *data = filp->private_data;
 	struct i2c_client *client = data->tmclient;
-	
+	unsigned char single_data[4] = {0};
+
 	/*if userspace like 0x33, use follow*/
 	//tmdata = arg;
 	/*if userspace like &buf, use follow	like the write() func param: buf*/
@@ -345,15 +356,16 @@ static long tm1650_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	switch (cmd) {
 		case TM1650_DIS_LEV:
 			client->addr = 0x24;
+			data->data[0] = tmdata;
+			i2c_master_send(client, data->data, 1);
 			break;
 		case TM1650_SET_DATA:
-			client->addr = 0x34;
+			set_single_data(tmdata, single_data);	
+			set_data_core(tm1650_addr, single_data);
 			break;
 		default:
 			return -1;
 	}
-	data->data[0] = tmdata;
-	i2c_master_send(client, data->data, 1);
 	
 	return 0;
 }
@@ -569,7 +581,7 @@ static void tm1650_get_year_work(void)
 		cent /= 10;
 	}
 	
-	set_time_core(tm1650_addr, single_data);
+	set_data_core(tm1650_addr, single_data);
 }
 
 /*
@@ -591,7 +603,7 @@ static void tm1650_get_day_work(void)
 	single_data[1] = tm.tm_mday / 10;
 	single_data[0] = tm.tm_mday % 10;
 
-	set_time_core(tm1650_addr, single_data);
+	set_data_core(tm1650_addr, single_data);
 }
 
 /*
