@@ -24,6 +24,8 @@ enum {TM1650_DIS_LEV = 0, TM1650_SET_DATA};
 static const char *procdir = "/proc";
 static const char *tmpath = "/dev/tm1650_led";
 
+struct list_head *g_current_node;
+
 static int isdigit_string(const char *name)
 {
 	while (*name) {
@@ -116,15 +118,22 @@ static void print_tm1650_list()
 /*
 具体数据的解析和发送，将会在kernel中处理
 */
-static void show_first_proc(int fd)
+static void show_keyevent_proc(struct list_head *current)
 {
-	struct list_head *ptr;
 	tm1650_proc *tmproc;
 
-	ptr = tm1650_proc_list.next;
-	tmproc = list_entry(ptr, tm1650_proc, lproc);
+	int tmfd = open(tmpath, O_RDWR);
+	if (tmfd < 0) {
+		dbgprint("open failed\n");
+		return ;
+	}
+
+	tmproc = list_entry(current, tm1650_proc, lproc);
+	if (!tmproc) {
+		dbgprint("list_entry error\n");	
+	}
 	//dbgprint("%d\n", tmproc->pid);
-	if (ioctl(fd, TM1650_SET_DATA, &tmproc->pid)) {
+	if (ioctl(tmfd, TM1650_SET_DATA, &tmproc->pid)) {
 		dbgprint("set failed\n");
 		return ;
 	}
@@ -137,14 +146,17 @@ static void set_data_core(int keyvalue)
 {
 	switch (keyvalue) {
 		case SABRESD_TM1650_NEXT:
+			g_current_node = g_current_node->next;
 			break;
 		case SABRESD_TM1650_PREV:
+			g_current_node = g_current_node->prev;
 			break;
 		case SABRESD_TM1650_DEL:
 			break;
 		default:
 			break;
 	}
+	show_keyevent_proc(g_current_node);
 }
 
 /*
@@ -207,7 +219,7 @@ static int show_next_by_key(void)
 				//printf("l_ret = %d\n", l_ret);
 				if (l_ret) {
 					if (key_event.type == EV_KEY) {
-						if (key_event.value == 0) {
+						if (key_event.value == 1) {
 							printf("key value(%d) %s\n", key_event.code, key_event.value ? "press" : "release");
 							set_data_core(key_event.code);
 						} else if (key_event.value == 1) {
@@ -241,12 +253,8 @@ static void show_by_listen_key()
 */
 static void display_proc_list()
 {
-	int tmfd = open(tmpath, O_RDWR);
-	if (tmfd < 0) {
-		dbgprint("open failed\n");
-		return ;
-	}
-	show_first_proc(tmfd);
+	g_current_node = tm1650_proc_list.next;
+	show_keyevent_proc(g_current_node);
 
 	/*创建一个线程来处理按键事件*/
 	show_by_listen_key();
