@@ -15,6 +15,10 @@
 
 #define BUF_SIZE  256
 #define DEBUG_PRINT
+#define SABRESD_TM1650_NEXT 1
+#define SABRESD_TM1650_PREV 5
+#define SABRESD_TM1650_DEL  9
+
 enum {TM1650_DIS_LEV = 0, TM1650_SET_DATA};
 
 static const char *procdir = "/proc";
@@ -127,6 +131,31 @@ static void show_first_proc(int fd)
 }
 
 /*
+按键切换显示进程id流程的实现
+*/
+static void set_data_core(int keyvalue)
+{
+	switch (keyvalue) {
+		case SABRESD_TM1650_NEXT:
+			break;
+		case SABRESD_TM1650_PREV:
+			break;
+		case SABRESD_TM1650_DEL:
+			break;
+		default:
+			break;
+	}
+}
+
+/*
+将当前led显示的数据闪烁两次
+*/
+static void set_flick()
+{
+
+}
+
+/*
 网络链接出处：http://blog.csdn.net/liuyi_lab/article/details/53956623
 */
 #define  KEY_EVENT_DEV0_NAME    "/dev/input/event0"
@@ -177,10 +206,13 @@ static int show_next_by_key(void)
 				l_ret = read(key_fd[i], &key_event, sizeof(key_event));
 				//printf("l_ret = %d\n", l_ret);
 				if (l_ret) {
-					if (key_event.type == EV_KEY
-							&& (key_event.value == 0
-								|| key_event.value == 1)) {
-						printf("key value(%d) %s\n", key_event.code, key_event.value ? "press" : "release");
+					if (key_event.type == EV_KEY) {
+						if (key_event.value == 0) {
+							printf("key value(%d) %s\n", key_event.code, key_event.value ? "press" : "release");
+							set_data_core(key_event.code);
+						} else if (key_event.value == 1) {
+							set_flick();
+						}
 					}
 				}
 			}
