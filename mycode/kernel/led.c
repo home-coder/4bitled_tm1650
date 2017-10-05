@@ -373,12 +373,13 @@ static long tm1650_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		case TM1650_DIS_FLICK:
 			deinfo("flick kernel start ...\n");
 			client->addr = 0x24;
-			for (; retry < 2; retry++) {
+			for (; retry < 4; retry++) {
 				data->data[0] = 0x0;
 				i2c_master_send(client, data->data, 1);
-				msleep(500);
+				msleep(200);
 				data->data[0] = 0x31;
 				i2c_master_send(client, data->data, 1);
+				msleep(200);
 			}
 			break;
 		default:
