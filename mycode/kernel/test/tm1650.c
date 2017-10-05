@@ -19,7 +19,9 @@
 #define SABRESD_TM1650_PREV 5
 #define SABRESD_TM1650_DEL  9
 
-enum {TM1650_DIS_LEV = 0, TM1650_SET_DATA};
+#define msleep(x) usleep(x*1000)
+
+enum {TM1650_DIS_LEV = 0, TM1650_SET_DATA, TM1650_DIS_FLICK};
 
 static const char *procdir = "/proc";
 static const char *tmpath = "/dev/tm1650_led";
@@ -137,6 +139,8 @@ static void show_keyevent_proc(struct list_head *current)
 		dbgprint("set failed\n");
 		return ;
 	}
+
+	close(tmfd);
 }
 
 /*
@@ -164,7 +168,20 @@ static void set_data_core(int keyvalue)
 */
 static void set_flick()
 {
+	int tmfd;
 
+	tmfd = open(tmpath, O_RDWR);
+	if (tmfd < 0) {
+		dbgprint("open failed\n");
+		exit(-1);
+	}
+
+	if (ioctl(tmfd, TM1650_DIS_FLICK, (void *)0)) {
+		dbgprint("set failed\n");
+		return ;
+	}
+
+	close(tmfd);
 }
 
 /*
@@ -223,7 +240,7 @@ static int show_next_by_key(void)
 							printf("key value(%d) %s\n", key_event.code, key_event.value ? "press" : "release");
 							fflush(stdout);
 							set_data_core(key_event.code);
-						} else if (key_event.value == 1) {
+						} else if (key_event.value == 0) {
 							set_flick();
 						}
 					}

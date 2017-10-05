@@ -32,7 +32,7 @@
 #define TM1650_SET_1111 IMX_GPIO_NR(5, 19)
 #define TIMER_LIST		32
 
-enum {TM1650_DIS_LEV = 0, TM1650_SET_DATA};
+enum {TM1650_DIS_LEV = 0, TM1650_SET_DATA, TM1650_DIS_FLICK};
 enum {GET_YEAR = 0, GET_DAY, GET_SECOND, GET_BACK};
 static int flag;
 
@@ -346,6 +346,9 @@ static long tm1650_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	struct tm1650_data *data = filp->private_data;
 	struct i2c_client *client = data->tmclient;
 	unsigned char single_data[4] = {0};
+	int retry = 0;
+
+	printk("tm1650 ioctl cmd = %d\n", cmd);
 
 	/*if userspace like 0x33, use follow*/
 	//tmdata = arg;
@@ -362,6 +365,17 @@ static long tm1650_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		case TM1650_SET_DATA:
 			set_single_data(tmdata, single_data);	
 			set_data_core(tm1650_addr, single_data);
+			break;
+		case TM1650_DIS_FLICK:
+			deinfo("flick kernel start ...\n");
+			client->addr = 0x24;
+			for (; retry < 2; retry++) {
+				data->data[0] = 0x0;
+				i2c_master_send(client, data->data, 1);
+				msleep(500);
+				data->data[0] = 0x31;
+				i2c_master_send(client, data->data, 1);
+			}
 			break;
 		default:
 			return -1;

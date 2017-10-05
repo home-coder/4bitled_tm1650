@@ -4,10 +4,10 @@ ARCH=arm
 #$(info, $(ARCH))//内核 androidmk使用
 ifeq ($(ARCH), arm)
     CC = ~/basic/cross_compile/gcc-4.6.2-glibc-2.13-linaro-multilib-2011.12/fsl-linaro-toolchain/bin/arm-fsl-linux-gnueabi-gcc
-    CFLAGS = -O2  -Wall --static
+    CFLAGS = -O2  -Wall -lpthread --static
 else
     CC = gcc
-    CFLAGS = -O2  -Wall --static
+    CFLAGS = -O2  -Wall -lpthread --static
 endif
 
 INCLUDE = -I ./include 
