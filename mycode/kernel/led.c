@@ -327,7 +327,7 @@ count, loff_t *offset)
 	return ret;
 }
 
-static void set_single_data(unsigned char tmdata, unsigned char *single_data)
+static void set_single_data(unsigned long tmdata, unsigned char *single_data)
 {
 	int i, cent = 1000;
 	for (i = 0; i < 4; i++) {
@@ -342,7 +342,7 @@ static void set_single_data(unsigned char tmdata, unsigned char *single_data)
 */
 static long tm1650_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
-	unsigned char tmdata;
+	unsigned long tmdata;
 	struct tm1650_data *data = filp->private_data;
 	struct i2c_client *client = data->tmclient;
 	unsigned char single_data[4] = {0};
@@ -350,8 +350,8 @@ static long tm1650_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	/*if userspace like 0x33, use follow*/
 	//tmdata = arg;
 	/*if userspace like &buf, use follow	like the write() func param: buf*/
-	get_user(tmdata, (unsigned char __user*)arg);
-	printk("tmdata is 0x%x\n", tmdata);
+	get_user(tmdata, (unsigned long __user*)arg);
+	printk("tmdata is %ld\n", tmdata);
 	
 	switch (cmd) {
 		case TM1650_DIS_LEV:

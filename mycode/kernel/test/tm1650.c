@@ -132,7 +132,7 @@ static void show_keyevent_proc(struct list_head *current)
 	if (!tmproc) {
 		dbgprint("list_entry error\n");	
 	}
-	//dbgprint("%d\n", tmproc->pid);
+	dbgprint("pid = %d\n", tmproc->pid);
 	if (ioctl(tmfd, TM1650_SET_DATA, &tmproc->pid)) {
 		dbgprint("set failed\n");
 		return ;
@@ -221,6 +221,7 @@ static int show_next_by_key(void)
 					if (key_event.type == EV_KEY) {
 						if (key_event.value == 1) {
 							printf("key value(%d) %s\n", key_event.code, key_event.value ? "press" : "release");
+							fflush(stdout);
 							set_data_core(key_event.code);
 						} else if (key_event.value == 1) {
 							set_flick();
