@@ -21,7 +21,10 @@
 
 #define msleep(x) usleep(x*1000)
 
-enum {TM1650_DIS_LEV = 0, TM1650_SET_DATA, TM1650_DIS_FLICK};
+#define TM1650_IOC_MAGIC 'm' //定义类型
+#define TM1650_DIS_LEV _IOW(TM1650_IOC_MAGIC,0,int)
+#define TM1650_SET_DATA _IOW(TM1650_IOC_MAGIC, 1, int)
+#define TM1650_DIS_FLICK _IOW(TM1650_IOC_MAGIC, 2, int)
 
 static const char *procdir = "/proc";
 static const char *tmpath = "/dev/tm1650_led";
