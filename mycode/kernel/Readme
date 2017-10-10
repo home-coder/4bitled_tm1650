@@ -1,0 +1,5 @@
+实现mmap驱动中的方式，并在test中进行测试
+
+sys机制的引入, class_creat和ATTR那个宏
+
+
