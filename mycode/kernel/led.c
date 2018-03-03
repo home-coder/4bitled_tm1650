@@ -864,6 +864,9 @@ static int __devinit tm1650_i2c_probe(struct i2c_client *client,
 	}
 
 	data->tmclient = client;
+	//TODO FIXME  或许这样做更加抽象
+	// 在tm1650_data结构体中的struct device *tmdevice = &client->dev
+	// 以后就完全在驱动中操作更加抽象和封装的tm1650_data 结构体就好了，不必还拿着client这种低级抽象对象满天飞了
 	dev_set_name(&client->dev, "tm1650_led");
 	memcpy(data->name, dev_name(&client->dev), sizeof(dev_name(&client->dev)));
 
